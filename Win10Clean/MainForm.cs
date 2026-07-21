@@ -17,8 +17,8 @@ namespace Win10Clean
     {
         public Version offlineVer = new Version(Application.ProductVersion);
         public Version onlineVer;
-        string serverUrl = "https://ElPumpo.github.io/Win10Clean/version2.txt";
-        string releasesUrl = "https://github.com/ElPumpo/Win10Clean/releases";
+        string serverUrl = "https://HawaiiBeach.github.io/Win10Clean/version2.txt";
+        string releasesUrl = "https://github.com/HawaiiBeach/Win10Clean/releases";
         bool amd64 = Environment.Is64BitOperatingSystem;
         Dictionary<string, string> appDirectory = new Dictionary<string, string>();
 

@@ -3,10 +3,10 @@
 # Win10Clean
 Cleanup your Windows enviroment!
 
-Check out the [wiki](https://github.com/ElPumpo/Win10Clean/wiki) for more information about the application
+Check out the [wiki](https://github.com/HawaiiBeach/Win10Clean/wiki) for more information about the application
 
 # Download
-Runnable executables [are available for download](https://github.com/ElPumpo/Win10Clean/releases)
+Runnable executables [are available for download](https://github.com/HawaiiBeach/Win10Clean/releases)
 
 # Requirements
 + Windows 11/10

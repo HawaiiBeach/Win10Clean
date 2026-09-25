@@ -1,0 +1,53 @@
+name: Build and Publish Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+    env:
+      ACTIONS_FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract Latest Changelog Entry
+        shell: pwsh
+        run: |
+          $content = Get-Content -Path "CHANGELOG.md" -Raw
+          if ($content -match '(?ms)(##\s*\[?v?[\d\.]+.*?)(?=\r?\n##\s|\Z)') {
+              $matches[1].Trim() | Out-File -FilePath "release_notes.md" -Encoding utf8
+          } else {
+              Write-Warning "Could not parse CHANGELOG.md."
+              New-Item -ItemType File -Path "release_notes.md" -Force
+          }
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build
+        run: msbuild Win10Clean.sln /p:Configuration=Release /p:Platform="Any CPU" /m
+
+      - name: Upload to VirusTotal
+        id: virustotal
+        uses: crazy-max/ghaction-virustotal@v4
+        with:
+          vt_api_key: ${{ secrets.VT_API_KEY }}
+          files: |
+            ./Win10Clean/bin/Release/Win10Clean.exe
+
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Win10Clean ${{ github.ref_name }}
+          files: ./Win10Clean/bin/Release/Win10Clean.exe
+          tag_name: ${{ github.ref_name }}
+          body_path: release_notes.md
+          draft: false

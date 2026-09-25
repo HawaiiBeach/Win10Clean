@@ -16,6 +16,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Extract Latest Changelog Entry
+        shell: pwsh
+        run: |
+          $content = Get-Content -Path "CHANGELOG.md" -Raw
+          if ($content -match '(?ms)(##\s*\[?v?[\d\.]+.*?)(?=\r?\n##\s|\Z)') {
+              $matches[1].Trim() | Out-File -FilePath "release_notes.md" -Encoding utf8
+          } else {
+              Write-Warning "Could not parse CHANGELOG.md."
+              New-Item -ItemType File -Path "release_notes.md" -Force
+          }
+
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
@@ -33,5 +44,6 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          name: Win10Clean ${{ github.ref_name }}
           files: ${{ env.ZIP_NAME }}
-          generate_release_notes: true
+          body_path: release_notes.md

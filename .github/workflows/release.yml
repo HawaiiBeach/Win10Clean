@@ -33,7 +33,7 @@ jobs:
         uses: microsoft/setup-msbuild@v2
 
       - name: Build
-        run: msbuild Win10Clean.sln /p:Configuration=Release /p:Platform="x64" /m
+        run: msbuild Win10Clean.sln /p:Configuration=Release /p:Platform="Any CPU" /m
 
       - name: Upload to VirusTotal
         id: virustotal

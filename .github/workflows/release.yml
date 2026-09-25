@@ -9,8 +9,10 @@ permissions:
   contents: write
 
 jobs:
-  build:
+  build-and-release:
     runs-on: windows-latest
+    env:
+      ACTIONS_FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout
@@ -33,17 +35,19 @@ jobs:
       - name: Build
         run: msbuild Win10Clean.sln /p:Configuration=Release /p:Platform="Any CPU" /m
 
-      - name: Package build output
-        shell: pwsh
-        run: |
-          $tag = "${{ github.ref_name }}"
-          $zipName = "Win10Clean-$tag.zip"
-          Compress-Archive -Path "Win10Clean\bin\Release\*" -DestinationPath $zipName
-          echo "ZIP_NAME=$zipName" >> $env:GITHUB_ENV
+      - name: Upload to VirusTotal
+        id: virustotal
+        uses: crazy-max/ghaction-virustotal@v4
+        with:
+          vt_api_key: ${{ secrets.VT_API_KEY }}
+          files: |
+            ./Win10Clean/bin/Release/Win10Clean.exe
 
-      - name: Create GitHub Release
+      - name: Publish Release
         uses: softprops/action-gh-release@v2
         with:
           name: Win10Clean ${{ github.ref_name }}
-          files: ${{ env.ZIP_NAME }}
+          files: ./Win10Clean/bin/Release/Win10Clean.exe
+          tag_name: ${{ github.ref_name }}
           body_path: release_notes.md
+          draft: false
